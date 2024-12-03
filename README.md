@@ -16,6 +16,9 @@ Team Members
 Bill Roan Simo Masso
 Architecture
 
+<img width="510" alt="Screenshot 2024-12-02 at 10 26 19 PM" src="https://github.com/user-attachments/assets/7b85e5c7-f3bd-4834-b708-e8dd27868710">
+
+
 The architecture of this web-based calculator is designed to handle different operations using modular components. Below is a diagram showing the architecture of the application:
 
 Description of Components:
