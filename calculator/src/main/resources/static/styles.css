@@ -1,0 +1,97 @@
+/* Main Calculator Container */
+.container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Header with Title and Clear Button */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.header h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+#clear-button {
+    background-color: #ffcc00;
+    padding: 8px 15px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#clear-button:hover {
+    background-color: #e0b200;
+}
+
+/* Instruction Section */
+.instruction {
+    background-color: #f7f7f7;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Input Textarea Styling */
+textarea {
+    width: 100%;
+    height: 150px;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Button Group Styling */
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.button-group button {
+    background-color: #ffcc00;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 48%;
+}
+
+.button-group button:hover {
+    background-color: #e0b200;
+}
+
+/* Output/Error Area Styling */
+.output {
+    background-color: #ffe0b2; /* Yellow background */
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #333;
+    text-align: center;
+    display: none; /* Hidden by default */
+}
+
+.error {
+    background-color: #f8d7da; /* Light red for errors */
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #721c24;
+    text-align: center;
+    display: none;
+}

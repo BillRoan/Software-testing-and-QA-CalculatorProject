@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>Calculator</h1>
+        <button id="clear-button">Clear</button>
+    </div>
+
+    <div class="instruction">
+        <p>Enter values below, then select an operation</p>
+    </div>
+
+    <textarea id="values" placeholder="Enter values here (separate by new line or comma)"></textarea>
+
+    <div class="button-group">
+        <button onclick="computeMean()">Compute Mean | one value per line</button>
+        <button onclick="computeSampleStdDev()">Compute Sample Standard Deviation | one value per linee</button>
+        <button onclick="computePopulationStdDev()">Compute Population Standard Deviation | one value per line</button>
+        <button onclick="computeZScore()">Compute Z Score | value, mean, stdDev on one line</button>
+        <button onclick="computeLinearRegression()">Compute single Linear Regression Formula | one x,y pair per line</button>
+        <button onclick="computeYFromLinearRegression()">Predict Y from Regression Formula | x, m, b on one line</button>
+    </div>
+
+    <div id="result" class="output"></div>
+</div>
+
+<script>
+    async function makePostRequest(url, data) {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch data");
+        }
+
+        return await response.json();
+    }
+
+    async function computeMean() {
+        const values = document.getElementById("values").value.split("\n").map(Number);
+        try {
+            const result = await makePostRequest('/api/calculator/mean', values);
+            displayResult(`Mean: ${result.result.toFixed(2)}`);
+        } catch (error) {
+            displayError("Error calculating mean.");
+        }
+    }
+
+    async function computeSampleStdDev() {
+        const values = document.getElementById("values").value.split("\n").map(Number);
+        try {
+            const result = await makePostRequest('/api/calculator/sample-std-dev', values);
+            displayResult(`Sample Standard Deviation: ${result.result.toFixed(2)}`);
+        } catch (error) {
+            displayError("Error calculating sample standard deviation.");
+        }
+    }
+
+    async function computePopulationStdDev() {
+        const values = document.getElementById("values").value.split("\n").map(Number);
+        try {
+            const result = await makePostRequest('/api/calculator/population-std-dev', values);
+            displayResult(`Population Standard Deviation: ${result.result.toFixed(2)}`);
+        } catch (error) {
+            displayError("Error calculating population standard deviation.");
+        }
+    }
+
+    async function computeZScore() {
+        const input = document.getElementById("values").value.split(",").map(Number); // Comma-separated input
+        if (input.length !== 3 || input.some(isNaN)) {
+            displayError("Please enter 3 numeric values: value, mean, stdDev.");
+            return;
+        }
+
+        const [value, mean, stdDev] = input;
+        try {
+            const result = await makePostRequest(`/api/calculator/z-score?value=${value}&mean=${mean}&stdDev=${stdDev}`);
+            displayResult(`Z-Score: ${result.result.toFixed(2)}`);
+        } catch (error) {
+            displayError("Error calculating Z-score.");
+        }
+    }
+
+    async function computeLinearRegression() {
+        const input = document.getElementById("values").value.split("\n").map(line => {
+            const [x, y] = line.split(",").map(Number);
+            return { x, y };
+        });
+
+        if (input.some(point => isNaN(point.x) || isNaN(point.y))) {
+            displayError("Invalid points. Enter values in the format x,y.");
+            return;
+        }
+
+        try {
+            const result = await makePostRequest('/api/calculator/linear-regression', input);
+            displayResult(result.result);
+        } catch (error) {
+            displayError("Error calculating linear regression.");
+        }
+    }
+
+    async function computeYFromLinearRegression() {
+        const input = document.getElementById("values").value.split(",").map(Number);
+        if (input.length !== 3 || input.some(isNaN)) {
+            displayError("Invalid input. Please enter x, m, b.");
+            return;
+        }
+
+        const [x, m, b] = input;
+        try {
+            const result = await makePostRequest('/api/calculator/compute-y', { x, m, b });
+            displayResult(`y = ${result.result.toFixed(2)} (from y = ${m.toFixed(2)}x + ${b.toFixed(2)})`);
+        } catch (error) {
+            displayError("Error calculating Y from regression formula.");
+        }
+    }
+
+    function displayResult(resultText) {
+        const resultContainer = document.getElementById("result");
+        resultContainer.style.display = "block";
+        resultContainer.innerText = resultText;
+        resultContainer.classList.remove('error');
+        resultContainer.classList.add('output');
+    }
+
+    function displayError(errorText) {
+        const resultContainer = document.getElementById("result");
+        resultContainer.style.display = "block";
+        resultContainer.innerText = errorText;
+        resultContainer.classList.remove('output');
+        resultContainer.classList.add('error');
+    }
+
+    document.getElementById("clear-button").addEventListener("click", function () {
+        document.getElementById("values").value = "";
+        document.getElementById("result").style.display = "none";
+    });
+</script>
+</body>
+</html>
