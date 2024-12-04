@@ -28,7 +28,7 @@ public class CalculatorService {
     // Compute Mean
     public CalculationResult computeMean(List<Double> values) {
         if (values == null || values.isEmpty()) {
-            return new CalculationResult("Mean", 0.0);
+            return new CalculationResult("Mean", "Input list is empty.");
         }
         double mean = values.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
         return new CalculationResult("Mean", mean);
@@ -48,30 +48,34 @@ public class CalculatorService {
     // Compute Population Standard Deviation
     public CalculationResult computePopulationStdDev(List<Double> values) {
         if (values == null || values.isEmpty()) {
-            return new CalculationResult("Population Standard Deviation", 0.0);
+            return new CalculationResult("Population Standard Deviation", "Input list is empty.");
         }
 
-        // Calculate the mean of the values
-        double mean = computeMean(values).getResult();
+        try {
+            // Calculate the mean of the values
+            double mean = computeMean(values).getResult();
 
-        // Calculate the sum of squared differences from the mean
-        double sumOfSquaredDifferences = values.stream()
-                .mapToDouble(val -> Math.pow(val - mean, 2))  // (xi - mean)^2
-                .sum();
+            // Calculate the sum of squared differences from the mean
+            double sumOfSquaredDifferences = values.stream()
+                    .mapToDouble(val -> Math.pow(val - mean, 2))  // (xi - mean)^2
+                    .sum();
 
-        // Divide by the number of elements to get the variance
-        double variance = sumOfSquaredDifferences / values.size();
+            // Avoid division by zero if there's only one value
+            double variance = sumOfSquaredDifferences / values.size();
 
-        // Take the square root of the variance to get the standard deviation
-        double populationStdDev = Math.sqrt(variance);
+            // Take the square root of the variance to get the population standard deviation
+            double populationStdDev = Math.sqrt(variance);
 
-        return new CalculationResult("Population Standard Deviation", populationStdDev);
+            return new CalculationResult("Population Standard Deviation", populationStdDev);
+        } catch (Exception e) {
+            return new CalculationResult("Population Standard Deviation", "Error during calculation: " + e.getMessage());
+        }
     }
 
     // Compute Linear Regression
     public CalculationResult computeLinearRegression(List<Point> points) {
         if (points == null || points.size() < 2) {
-            return new CalculationResult("Linear Regression", "Not enough data");
+            return new CalculationResult("Linear Regression", "Not enough data points. Minimum 2 points are required.");
         }
 
         double n = points.size();
@@ -80,10 +84,24 @@ public class CalculatorService {
         double sumXY = points.stream().mapToDouble(p -> p.getX() * p.getY()).sum();
         double sumX2 = points.stream().mapToDouble(p -> Math.pow(p.getX(), 2)).sum();
 
-        double slope = (n * sumXY - sumX * sumY) / (n * sumX2 - Math.pow(sumX, 2));
-        double intercept = (sumY - slope * sumX) / n;
 
-        return new CalculationResult("Linear Regression", "y = " + String.format("%.2fx + %.2f", slope, intercept));
+        // Check for the denominator to avoid division by zero
+        double denominator = (n * sumX2 - Math.pow(sumX, 2));
+        if (denominator == 0) {
+            return new CalculationResult("Linear Regression", "Error: Denominator is zero, which means data points may be collinear.");
+        }
+
+        // Calculate slope (m)
+        double slope = (n * sumXY - sumX * sumY) / denominator;
+
+        // Calculate intercept (b)
+        double intercept = (sumY - slope * sumX) / n;
+        
+
+        // Return result as a string in the form "y = mx + b"
+        String regressionEquation = "y = " + String.format("%.2fx + %.2f", slope, intercept);
+
+        return new CalculationResult("Linear Regression", regressionEquation);
     }
 
     // Compute Y from Linear Regression Formula
