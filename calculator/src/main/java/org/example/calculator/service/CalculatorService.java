@@ -96,7 +96,7 @@ public class CalculatorService {
 
         // Calculate intercept (b)
         double intercept = (sumY - slope * sumX) / n;
-        
+
 
         // Return result as a string in the form "y = mx + b"
         String regressionEquation = "y = " + String.format("%.2fx + %.2f", slope, intercept);
